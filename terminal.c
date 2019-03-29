@@ -5052,6 +5052,7 @@ static void do_paint(Terminal *term, Context ctx, int may_optimise)
 			dirty_run = TRUE;
 		    copy_termchar(term->disptext[i], j, d);
 		    term->disptext[i]->chars[j].attr = tattr;
+		    ch[ccount++] = (wchar_t) 0xDFFF;
 		}
 	    }
 	}
