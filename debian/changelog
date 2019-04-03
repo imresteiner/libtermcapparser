@@ -1,3 +1,9 @@
+libtermcapparser (1.0.15) bionic; urgency=low
+
+  * Fixed wide character handling
+
+ -- Peter Zoltan Varga <peter.zoltan.varga@balabit.com>  Wed, 03 Apr 2019 12:00:00 +0000
+
 libtermcapparser (1.0.14) xenial; urgency=low
 
   * added target for macos
