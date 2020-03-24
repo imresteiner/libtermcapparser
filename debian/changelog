@@ -1,3 +1,9 @@
+libtermcapparser (1.0.17) bionic; urgency=low
+
+  * generate third party licenses into deb packages
+
+ -- Imre Steiner <imre.steiner@oneidentity.com>  Tue, 24 Mar 2020 12:56:42 +0000
+
 libtermcapparser (1.0.16) bionic; urgency=low
 
   * Fixed debian/copyright
