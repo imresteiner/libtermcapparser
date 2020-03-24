@@ -42,6 +42,8 @@ binary-arch: binary-libtermcapparser binary-libtermcapparser-dev
 	dh_shlibdeps
 	dh_gencontrol
 	dh_md5sums
+	mkdir -p debian/libtermcapparser-dbg/usr/share/doc/libtermcapparser-dbg
+	dh_third_party_meta
 	dh_builddeb
 
 binary: binary-arch
