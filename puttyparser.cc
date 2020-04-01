@@ -155,14 +155,20 @@ void palette_set(void *frontend, int n, int r, int g, int b)
 {
   struct gui_data *inst = (struct gui_data *)frontend;
 
-  inst->parser->get_palette().set_color(n, r, g, b);
+  if (static_cast<size_t>(n) >= inst->parser->get_palette().colors.size())
+    return;
+
+  inst->parser->get_palette().colors[n] = Putty::RgbColor{
+                                          static_cast<uint8_t>(r),
+                                          static_cast<uint8_t>(g),
+                                          static_cast<uint8_t>(b)};
 }
 
 void palette_reset(void *frontend)
 {
   struct gui_data *inst = (struct gui_data *)frontend;
 
-  inst->parser->get_palette().reset();
+  inst->parser->get_palette() = Putty::Palette{};
 }
 
 void write_clip(void *frontend, wchar_t * data, int *attr, int len, int must_deselect)

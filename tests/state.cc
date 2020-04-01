@@ -28,7 +28,7 @@ class TestState : public ::testing::Test
 public:
   void SetUp()
   {
-    palette.set_color(1, 2, 3, 4);
+    palette.colors[1] = RgbColor{2, 3, 4};
 
     state = new StateMock();
     state->resize(1024, 768, 128);
@@ -121,7 +121,7 @@ TEST_F(TestState, GetPalette)
 {
   const Palette &pal = state->get_palette();
 
-  ASSERT_EQ("#020304", pal.lookup(1).as_hex());
+  ASSERT_EQ((RgbColor{2, 3, 4}), pal.colors.at(1));
 }
 
 TEST_F(TestState, ResizeBigger)

@@ -315,7 +315,7 @@ TEST(TestTermcapParser, PaletteSetColor)
 
   parser.data_input(input, sizeof(input) - 1);
 
-  ASSERT_EQ("#123456", parser.get_palette().lookup(0).as_hex());
+  ASSERT_EQ((RgbColor{0x12, 0x34, 0x56}), parser.get_palette().colors.at(0));
 }
 
 TEST(TestTermcapParser, PaletteReset)
@@ -326,7 +326,7 @@ TEST(TestTermcapParser, PaletteReset)
 
   parser.data_input(input, sizeof(input) - 1);
 
-  ASSERT_EQ("#000000", parser.get_palette().lookup(0).as_hex());
+  ASSERT_EQ((RgbColor{0, 0, 0}), parser.get_palette().colors.at(0));
 }
 
 /**

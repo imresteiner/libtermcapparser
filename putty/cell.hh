@@ -26,13 +26,6 @@ namespace Putty
      *
      * TODO: Remove after integration.
      */
-    typedef Palette::RgbColor RgbColor;
-
-    /**
-     * Compatibility definition so old interface is still usable.
-     *
-     * TODO: Remove after integration.
-     */
     typedef unsigned long Character;
 
     /** Character attributes */
