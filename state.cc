@@ -25,12 +25,9 @@ State::State(const State &other)
     cursor_enabled(other.cursor_enabled),
     cursor_x(other.cursor_x),
     cursor_y(other.cursor_y),
-    rows(0),
+    rows(other.rows),
     palette(other.palette)
 {
-  rows = new Row[height + buffer_size];
-  for (unsigned row = 0; row < (height + buffer_size); ++row)
-    rows[row] = other.rows[row];
 }
 
 State &
@@ -57,14 +54,12 @@ State::swap(State &other)
 
 State::~State()
 {
-  if (rows)
-    delete [] rows;
 }
 
 bool
 State::is_invalid_row_value(int row) const
 {
-  return (rows == 0) || ((int)(row - height) >= 0 || (int)(row + buffer_size) < 0);
+  return ((int)(row - height) >= 0 || (int)(row + buffer_size) < 0);
 }
 
 bool
@@ -92,12 +87,12 @@ State::get_row(int row) const
 }
 
 bool
-State::set_cell(int row, unsigned col, const std::wstring &characters, Cell::Attributes attr)
+State::set_cell(int row, unsigned col, const std::wstring &characters, uint64_t attr)
 {
   if (!is_valid_cell(row, col))
     return false;
 
-  rows[row + buffer_size].cells[col].set(characters, attr);
+  rows[row + buffer_size].cells[col] = Cell{characters, attr & CellHelpers::ValidMask};
   return true;
 }
 
@@ -128,21 +123,21 @@ State::resize(unsigned a_width, unsigned a_height, unsigned a_buffer_size)
   if (a_width == width && height == a_height && buffer_size == a_buffer_size)
     return;
 
-  Row *new_rows = new Row[a_height + a_buffer_size];
+  std::vector<Row> new_rows;
+  new_rows.resize(a_height + a_buffer_size);
 
   for (int i = -a_buffer_size; i < (int)a_height; ++i)
     {
       // Copy lines from the original
       if (i >= -(int)buffer_size && i < (int)height)
-        new_rows[i + a_buffer_size] = rows[i + buffer_size];
+        new_rows[i + a_buffer_size] = std::move(rows[i + buffer_size]);
 
-      new_rows[i + a_buffer_size].set_width(a_width);
+      new_rows[i + a_buffer_size].cells.resize(a_width);
     }
 
   height = a_height;
   width = a_width;
   buffer_size = a_buffer_size;
 
-  delete [] rows;
-  rows = new_rows;
+  rows = std::move(new_rows);
 }

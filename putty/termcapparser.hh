@@ -133,7 +133,7 @@ namespace Putty
     void data_input_filtered(const char *data, int len);
 
   private:
-    void set_cell(int row, unsigned col, const std::wstring &characters, Cell::Attributes attr) const;
+    void set_cell(int row, unsigned col, const std::wstring &characters, uint64_t attr) const;
 
     /**
      * Copy the content of the terminal into the cached state.

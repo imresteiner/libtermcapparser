@@ -235,7 +235,7 @@ TermcapParser::data_input_filtered(const char *data, int len)
 }
 
 void
-TermcapParser::set_cell(int row, unsigned col, const std::wstring &characters, Cell::Attributes attr) const
+TermcapParser::set_cell(int row, unsigned col, const std::wstring &characters, uint64_t attr) const
 {
   bool success = state.set_cell(row, col, characters, attr);
   if (!success)
@@ -281,7 +281,7 @@ TermcapParser::copy_term_content_to_cache(int offset, unsigned row_count) const
           continue;
         }
 
-      r->set_attributes(inst->term->disptext[row]->lattr);
+      r->attributes = inst->term->disptext[row]->lattr;
       for (unsigned col = 0; col < (unsigned)inst->term->cols; col++)
         {
           int relative_offset;
@@ -383,7 +383,7 @@ TermcapParser::update_display(int x, int y, const std::wstring &str, unsigned lo
       return;
     }
 
-  row->set_attributes(lattr);
+  row->attributes = lattr;
   for (std::wstring::const_iterator it = str.begin(); it != str.end(); ++it)
     {
       if (it != str.begin() && !is_combining_character(*it))

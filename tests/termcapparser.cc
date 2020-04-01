@@ -24,12 +24,12 @@ TEST(TestTermcapParser, Initialize)
           ASSERT_TRUE(cell);
 
           // Check character
-          ASSERT_EQ(0x20, cell->get_characters()[0]) << "Cell character not a space in row " << row << " col " << col;
+          ASSERT_EQ(0x20, cell->characters[0]) << "Cell character not a space in row " << row << " col " << col;
 
           // Check other valid attributes
-          ASSERT_EQ(0, cell->get_attributes() & Cell::FlagMask);
-          ASSERT_EQ(256, cell->foreground_code());
-          ASSERT_EQ(258, cell->background_code());
+          ASSERT_EQ(0, cell->attributes & CellHelpers::FlagMask);
+          ASSERT_EQ(256, foreground_code(*cell));
+          ASSERT_EQ(258, background_code(*cell));
         }
     }
 }
@@ -42,22 +42,22 @@ TEST(TestTermcapParser, InputData)
 
   const State &state = parser.get_state();
 
-  ASSERT_EQ(L"A", state.get_cell(0, 0)->get_characters());
-  ASSERT_EQ(L"B", state.get_cell(0, 1)->get_characters());
-  ASSERT_EQ(L"C", state.get_cell(0, 2)->get_characters());
-  ASSERT_EQ(L"D", state.get_cell(0, 3)->get_characters());
+  ASSERT_EQ(L"A", state.get_cell(0, 0)->characters);
+  ASSERT_EQ(L"B", state.get_cell(0, 1)->characters);
+  ASSERT_EQ(L"C", state.get_cell(0, 2)->characters);
+  ASSERT_EQ(L"D", state.get_cell(0, 3)->characters);
 
-  ASSERT_EQ(256, state.get_cell(0, 0)->foreground_code());
-  ASSERT_EQ(258, state.get_cell(0, 0)->background_code());
+  ASSERT_EQ(256, foreground_code(*state.get_cell(0, 0)));
+  ASSERT_EQ(258, background_code(*state.get_cell(0, 0)));
 
-  ASSERT_EQ(1, state.get_cell(0, 1)->foreground_code());
-  ASSERT_EQ(258, state.get_cell(0, 1)->background_code());
+  ASSERT_EQ(1, foreground_code(*state.get_cell(0, 1)));
+  ASSERT_EQ(258, background_code(*state.get_cell(0, 1)));
 
-  ASSERT_EQ(1, state.get_cell(0, 2)->foreground_code());
-  ASSERT_EQ(2, state.get_cell(0, 2)->background_code());
+  ASSERT_EQ(1, foreground_code(*state.get_cell(0, 2)));
+  ASSERT_EQ(2, background_code(*state.get_cell(0, 2)));
 
-  ASSERT_EQ(256, state.get_cell(0, 3)->foreground_code());
-  ASSERT_EQ(258, state.get_cell(0, 3)->background_code());
+  ASSERT_EQ(256, foreground_code(*state.get_cell(0, 3)));
+  ASSERT_EQ(258, background_code(*state.get_cell(0, 3)));
 }
 
 TEST(TestTermcapParser, Resize)
@@ -79,22 +79,22 @@ TEST(TestTermcapParser, EncodingUTF8)
   TermcapParser parser("UTF-8");
   // Euro sign in utf-8
   parser.data_input("\xE2\x82\xAC", 3);
-  ASSERT_EQ(0x20AC, parser.get_state().get_cell(0, 0)->get_characters()[0]);
+  ASSERT_EQ(0x20AC, parser.get_state().get_cell(0, 0)->characters[0]);
 
   // Another euro sign in three steps
   parser.data_input("\xE2", 1);
-  ASSERT_EQ(L" ", parser.get_state().get_cell(0, 1)->get_characters());
+  ASSERT_EQ(L" ", parser.get_state().get_cell(0, 1)->characters);
   parser.data_input("\x82", 1);
-  ASSERT_EQ(L" ", parser.get_state().get_cell(0, 1)->get_characters());
+  ASSERT_EQ(L" ", parser.get_state().get_cell(0, 1)->characters);
   parser.data_input("\xAC", 1);
-  ASSERT_EQ(0x20AC, parser.get_state().get_cell(0, 1)->get_characters()[0]);
+  ASSERT_EQ(0x20AC, parser.get_state().get_cell(0, 1)->characters[0]);
 }
 
 TEST(TestTermcapParser, EncodingLatin2)
 {
   TermcapParser parser("iso-8859-2");
   parser.data_input("\xd0", 1);
-  ASSERT_EQ(0x110, parser.get_state().get_cell(0, 0)->get_characters()[0]);
+  ASSERT_EQ(0x110, parser.get_state().get_cell(0, 0)->characters[0]);
 }
 
 TEST(TestTermcapParser, EncodingLatin15)
@@ -102,7 +102,7 @@ TEST(TestTermcapParser, EncodingLatin15)
   TermcapParser parser("iso-8859-15");
   // Euro sign in iso-8859-15
   parser.data_input("\xa4", 1);
-  ASSERT_EQ(0x20AC, parser.get_state().get_cell(0, 0)->get_characters()[0]);
+  ASSERT_EQ(0x20AC, parser.get_state().get_cell(0, 0)->characters[0]);
 }
 
 /**
@@ -116,13 +116,13 @@ TEST(TestTermcapParser, ColorConfiguration)
 
   // Check ANSI color
   parser.data_input(ansi_color_input, sizeof(ansi_color_input) - 1);
-  ASSERT_EQ(1, parser.get_state().get_cell(0, 0)->foreground_code());
-  ASSERT_EQ(2, parser.get_state().get_cell(0, 0)->background_code());
+  ASSERT_EQ(1, foreground_code(*parser.get_state().get_cell(0, 0)));
+  ASSERT_EQ(2, background_code(*parser.get_state().get_cell(0, 0)));
 
   // Check xterm 256 color
   parser.data_input(xterm256_color_input, sizeof(xterm256_color_input) - 1);
-  ASSERT_EQ(126, parser.get_state().get_cell(0, 1)->foreground_code());
-  ASSERT_EQ(127, parser.get_state().get_cell(0, 1)->background_code());
+  ASSERT_EQ(126, foreground_code(*parser.get_state().get_cell(0, 1)));
+  ASSERT_EQ(127, background_code(*parser.get_state().get_cell(0, 1)));
 }
 
 TEST(TestTermcapParser, BceConfiguration)
@@ -131,7 +131,7 @@ TEST(TestTermcapParser, BceConfiguration)
   TermcapParser parser("UTF-8");
 
   parser.data_input(input, sizeof(input) - 1);
-  ASSERT_EQ(1, parser.get_state().get_cell(0, 35)->foreground_code());
+  ASSERT_EQ(1, foreground_code(*parser.get_state().get_cell(0, 35)));
 }
 
 TEST(TestTermcapParser, LFhasCRConfiguration)
@@ -140,14 +140,14 @@ TEST(TestTermcapParser, LFhasCRConfiguration)
   TermcapParser parser_nolf("UTF-8");
 
   parser_nolf.data_input(input, sizeof(input) - 1);
-  ASSERT_EQ(L"a", parser_nolf.get_state().get_cell(0, 0)->get_characters());
-  ASSERT_EQ(L"b", parser_nolf.get_state().get_cell(1, 1)->get_characters());
+  ASSERT_EQ(L"a", parser_nolf.get_state().get_cell(0, 0)->characters);
+  ASSERT_EQ(L"b", parser_nolf.get_state().get_cell(1, 1)->characters);
 
   TermcapParser parser_lfcr("UTF-8");
   parser_lfcr.replace_standalone_linefeeds(true);
   parser_lfcr.data_input(input, sizeof(input) - 1);
-  ASSERT_EQ(L"a", parser_lfcr.get_state().get_cell(0, 0)->get_characters());
-  ASSERT_EQ(L"b", parser_lfcr.get_state().get_cell(1, 0)->get_characters());
+  ASSERT_EQ(L"a", parser_lfcr.get_state().get_cell(0, 0)->characters);
+  ASSERT_EQ(L"b", parser_lfcr.get_state().get_cell(1, 0)->characters);
 }
 
 TEST(TestTermcapParser, FilterControlSequence)
@@ -158,10 +158,10 @@ TEST(TestTermcapParser, FilterControlSequence)
 
   const State &state = parser.get_state();
 
-  ASSERT_EQ(L"A", state.get_cell(0, 0)->get_characters());
-  ASSERT_EQ(L"B", state.get_cell(0, 1)->get_characters());
-  ASSERT_EQ(L"I", state.get_cell(0, 2)->get_characters());
-  ASSERT_EQ(L"J", state.get_cell(0, 3)->get_characters());
+  ASSERT_EQ(L"A", state.get_cell(0, 0)->characters);
+  ASSERT_EQ(L"B", state.get_cell(0, 1)->characters);
+  ASSERT_EQ(L"I", state.get_cell(0, 2)->characters);
+  ASSERT_EQ(L"J", state.get_cell(0, 3)->characters);
 }
 
 TEST(TestTermcapParser, FilterConsecutiveControlSequences1)
@@ -173,7 +173,7 @@ TEST(TestTermcapParser, FilterConsecutiveControlSequences1)
 
   char data[6];
   for (unsigned col = 0; col < 5; ++col)
-    data[col] = (char)parser.get_state().get_cell(0, col)->get_characters()[0];
+    data[col] = (char)parser.get_state().get_cell(0, col)->characters[0];
   data[5] = '\0';
 
   ASSERT_STREQ("abcef", data);
@@ -191,7 +191,7 @@ TEST(TestTermcapParser, FilterConsecutiveControlSequences2)
 
   char data[7];
   for (unsigned col = 0; col < 6; ++col)
-    data[col] = (char)parser.get_state().get_cell(0, col)->get_characters()[0];
+    data[col] = (char)parser.get_state().get_cell(0, col)->characters[0];
   data[6] = '\0';
 
   ASSERT_STREQ("abcdef", data);
@@ -207,10 +207,10 @@ TEST(TestTermcapParser, FilterControlSequenceBuffering1)
 
   const State &state = parser.get_state();
 
-  ASSERT_EQ(L"A", state.get_cell(0, 0)->get_characters());
-  ASSERT_EQ(L"B", state.get_cell(0, 1)->get_characters());
-  ASSERT_EQ(L"I", state.get_cell(0, 2)->get_characters());
-  ASSERT_EQ(L"J", state.get_cell(0, 3)->get_characters());
+  ASSERT_EQ(L"A", state.get_cell(0, 0)->characters);
+  ASSERT_EQ(L"B", state.get_cell(0, 1)->characters);
+  ASSERT_EQ(L"I", state.get_cell(0, 2)->characters);
+  ASSERT_EQ(L"J", state.get_cell(0, 3)->characters);
 }
 
 TEST(TestTermcapParser, FilterControlSequenceBuffering2)
@@ -223,10 +223,10 @@ TEST(TestTermcapParser, FilterControlSequenceBuffering2)
 
   const State &state = parser.get_state();
 
-  ASSERT_EQ(L"A", state.get_cell(0, 0)->get_characters());
-  ASSERT_EQ(L"B", state.get_cell(0, 1)->get_characters());
-  ASSERT_EQ(L"I", state.get_cell(0, 2)->get_characters());
-  ASSERT_EQ(L"J", state.get_cell(0, 3)->get_characters());
+  ASSERT_EQ(L"A", state.get_cell(0, 0)->characters);
+  ASSERT_EQ(L"B", state.get_cell(0, 1)->characters);
+  ASSERT_EQ(L"I", state.get_cell(0, 2)->characters);
+  ASSERT_EQ(L"J", state.get_cell(0, 3)->characters);
 }
 
 TEST(TestTermcapParser, FilterControlSequenceStartingWithControlSequence)
@@ -239,8 +239,8 @@ TEST(TestTermcapParser, FilterControlSequenceStartingWithControlSequence)
 
   const State &state = parser.get_state();
 
-  ASSERT_EQ(L"I", state.get_cell(0, 0)->get_characters());
-  ASSERT_EQ(L"J", state.get_cell(0, 1)->get_characters());
+  ASSERT_EQ(L"I", state.get_cell(0, 0)->characters);
+  ASSERT_EQ(L"J", state.get_cell(0, 1)->characters);
 }
 
 TEST(TestTermcapParser, FilterControlSequenceEscapeCharInTheMiddle)
@@ -253,10 +253,10 @@ TEST(TestTermcapParser, FilterControlSequenceEscapeCharInTheMiddle)
 
   const State &state = parser.get_state();
 
-  ASSERT_EQ(L"A", state.get_cell(0, 0)->get_characters());
-  ASSERT_EQ(L"B", state.get_cell(0, 1)->get_characters());
-  ASSERT_EQ(L"I", state.get_cell(0, 2)->get_characters());
-  ASSERT_EQ(L"J", state.get_cell(0, 3)->get_characters());
+  ASSERT_EQ(L"A", state.get_cell(0, 0)->characters);
+  ASSERT_EQ(L"B", state.get_cell(0, 1)->characters);
+  ASSERT_EQ(L"I", state.get_cell(0, 2)->characters);
+  ASSERT_EQ(L"J", state.get_cell(0, 3)->characters);
 }
 
 /**
@@ -271,9 +271,9 @@ TEST(TestTermcapParser, Buffer)
   parser.data_input(input, sizeof(input) - 1);
 
   ASSERT_EQ(1, parser.get_state().get_buffer_size());
-  ASSERT_EQ(L"c", parser.get_state().get_cell(1, 0)->get_characters());
-  ASSERT_EQ(L"b", parser.get_state().get_cell(0, 0)->get_characters());
-  ASSERT_EQ(L"a", parser.get_state().get_cell(-1, 0)->get_characters());
+  ASSERT_EQ(L"c", parser.get_state().get_cell(1, 0)->characters);
+  ASSERT_EQ(L"b", parser.get_state().get_cell(0, 0)->characters);
+  ASSERT_EQ(L"a", parser.get_state().get_cell(-1, 0)->characters);
 }
 
 TEST(TestTermcapParser, ClearBuffer)
@@ -286,7 +286,7 @@ TEST(TestTermcapParser, ClearBuffer)
   parser.clear_buffer();
 
   ASSERT_EQ(0, parser.get_state().get_buffer_size());
-  ASSERT_EQ(L"c", parser.get_state().get_cell(0, 0)->get_characters());
+  ASSERT_EQ(L"c", parser.get_state().get_cell(0, 0)->characters);
 }
 
 /**
@@ -300,8 +300,8 @@ TEST(TestTermcapParser, LineAttribute)
 
   parser.data_input(input, sizeof(input) - 1);
 
-  ASSERT_EQ(Row::TOP, parser.get_state().get_row(0)->get_attributes());
-  ASSERT_EQ(Row::BOTTOM, parser.get_state().get_row(1)->get_attributes());
+  ASSERT_EQ(to_underlying(RowFlags::TOP), parser.get_state().get_row(0)->attributes);
+  ASSERT_EQ(to_underlying(RowFlags::BOTTOM), parser.get_state().get_row(1)->attributes);
 }
 
 /**
@@ -340,8 +340,8 @@ TEST(TestTermcapParser, LattrBuffered)
 
   parser.data_input(input, sizeof(input) - 1);
 
-  ASSERT_EQ(Row::NORMAL, parser.get_state().get_row(0)->get_mode());
-  ASSERT_EQ(Row::TOP, parser.get_state().get_row(-1)->get_mode());
+  ASSERT_EQ(to_underlying(RowFlags::NORMAL), get_mode(*parser.get_state().get_row(0)));
+  ASSERT_EQ(to_underlying(RowFlags::TOP), get_mode(*parser.get_state().get_row(-1)));
 }
 
 /**
@@ -355,8 +355,8 @@ TEST(TestTermcapParser, Combining)
 
   parser.data_input(input, sizeof(input) - 1);
 
-  ASSERT_EQ(L"I\u0300", parser.get_state().get_cell(0, 0)->get_characters());
-  ASSERT_EQ(L"I", parser.get_state().get_cell(0, 1)->get_characters());
+  ASSERT_EQ(L"I\u0300", parser.get_state().get_cell(0, 0)->characters);
+  ASSERT_EQ(L"I", parser.get_state().get_cell(0, 1)->characters);
 }
 
 namespace

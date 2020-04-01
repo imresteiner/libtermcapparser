@@ -125,7 +125,7 @@ namespace Putty
      *
      * Returns if setting the cell was successful, or not (the row/column was out of bounds).
      */
-    bool set_cell(int row, unsigned col, const std::wstring &characters, Cell::Attributes attr);
+    bool set_cell(int row, unsigned col, const std::wstring &characters, uint64_t attr);
 
     /**
      * Set the set_alternate_screen according to the given parameter.
@@ -187,7 +187,7 @@ namespace Putty
     int cursor_y;
 
     /** List of rows. */
-    Row *rows;
+    std::vector< Row > rows;
 
     /** Palette of the state */
     Palette palette;
