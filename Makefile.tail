@@ -1,5 +1,5 @@
 OBJECTS = $(notdir $(CXX_OBJS:.cc=.o) $(C_OBJS:.c=.o))
-CCFLAGS = $(CFLAGS)
+CXXFLAGS = $(CFLAGS) -std=c++17
 MAKEFILE_DEP = Makefile.$(TARGET_OS).dep
 
 all: $(TARGET)
@@ -8,7 +8,7 @@ $(TARGET): $(OBJECTS)
 	$(CXX) $(LDFLAGS) -o $@ $(OBJECTS)
 
 $(CXX_OBJS:.cc=.o):
-	$(CXX) $(COMPAT) $(CCFLAGS) -c $<
+	$(CXX) $(COMPAT) $(CXXFLAGS) -c $<
 
 $(notdir $(C_OBJS:.c=.o)):
 	$(CC) $(COMPAT) $(CFLAGS) $(XFLAGS) -c $<
