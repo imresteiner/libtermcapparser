@@ -122,8 +122,7 @@ namespace
 }
 
 TermcapParser::TermcapParser(const char *charset, int terminal_buffer_height)
-  : enable_update_display(true),
-    terminal_buffer_height(terminal_buffer_height),
+  : terminal_buffer_height(terminal_buffer_height),
     log_callback(0)
 {
   /* Create an instance structure and initialise to zeroes */
@@ -374,9 +373,6 @@ TermcapParser::clear_buffer()
 void
 TermcapParser::update_display(int x, int y, const std::wstring &str, unsigned long attr, long lattr)
 {
-  if (!enable_update_display)
-    return;
-
   std::wstring chr;
   Row *row = state.get_row_internal(y);
   if (!row)

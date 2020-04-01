@@ -156,7 +156,6 @@ namespace Putty
 
     Palette palette;                      /**< Currently used palette */
 
-    mutable bool enable_update_display;   /**< Enable/disable updating the display with update_display */
     int terminal_buffer_height;           /**< Terminal buffer height */
     LogCallback log_callback;             /**< Log callback function */
 
