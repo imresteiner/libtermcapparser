@@ -41,7 +41,7 @@ namespace Putty
      * @param charset Character encoding of the terminal emulation.
      * @param terminal_buffer_height Terminal buffer height, zero means buffer is disabled.
      */
-    TermcapParser(const char *charset, int terminal_buffer_height = 100000);
+    explicit TermcapParser(const char *charset, int terminal_buffer_height = 100000);
 
     /**
      * Destructor.
@@ -133,7 +133,7 @@ namespace Putty
     void data_input_filtered(const char *data, int len);
 
   private:
-    void set_cell(int row, unsigned col, const std::wstring &characters, uint64_t attr) const;
+    void set_cell(int row, int col, const std::wstring &characters, uint64_t attr) const;
 
     /**
      * Copy the content of the terminal into the cached state.
@@ -141,7 +141,7 @@ namespace Putty
      * @param offset Row offset to copy
      * @param row_count Number of rows to copy.
      */
-    void copy_term_content_to_cache(int offset, unsigned row_count) const;
+    void copy_term_content_to_cache(int offset, int row_count) const;
 
     /**
      * Log message if the log callback is set.

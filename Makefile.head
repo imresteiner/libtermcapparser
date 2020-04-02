@@ -8,6 +8,6 @@ HEADER_DIR=putty
 HEADERS=$(HEADER_DIR)/termcapparser.hh $(HEADER_DIR)/state.hh $(HEADER_DIR)/row.hh $(HEADER_DIR)/cell.hh $(HEADER_DIR)/palette.hh
 LDFLAGS+=-shared
 
-CXX_OBJS = puttyparser.cc termcapparser.cc state.cc
+CXX_OBJS = puttyparser.cc termcapparser.cc
 
 C_OBJS_COMMON = ldisc.c ldiscucs.c minibidi.c misc.c terminal.c time.c fake_timing.c tree234.c wcwidth.c charset/utf8.c charset/sbcsdat.c charset/fromucs.c charset/localenc.c charset/mimeenc.c charset/sbcs.c charset/slookup.c charset/toucs.c charset/xenc.c
