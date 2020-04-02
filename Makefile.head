@@ -1,7 +1,7 @@
 libdir=$(PREFIX)/lib
 incdir=$(PREFIX)/include
 
-CFLAGS_COMMON = -O2 -Wall -g -I./ -I./charset/ -DNO_GSSAPI
+CFLAGS_COMMON = -O3 -pedantic -Wall -g -I./ -I./charset/ -DNO_GSSAPI
 INSTALL = install
 
 HEADER_DIR=putty
